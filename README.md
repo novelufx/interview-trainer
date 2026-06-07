@@ -4,6 +4,8 @@
 
 > 当前版本：**v3.0.0**
 
+> **[Demo](https://novelufx.github.io/interview-trainer/)**
+
 ---
 
 ## 功能列表

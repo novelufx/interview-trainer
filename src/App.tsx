@@ -28,6 +28,7 @@ export default function App() {
   const [quickWeakFilter, setQuickWeakFilter] = useState(false);
   const [showBatchImportModal, setShowBatchImportModal] = useState(false);
   const [showAiSettingsModal, setShowAiSettingsModal] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   // Load data on mount
   useEffect(() => {
@@ -50,12 +51,14 @@ export default function App() {
       saveQuestions(sampleQuestions);
       saveSelectedId(sampleQuestions[0].id);
     }
+    setHydrated(true);
   }, []);
 
   // Persist questions
   useEffect(() => {
+    if (!hydrated) return;
     saveQuestions(questions);
-  }, [questions]);
+  }, [questions, hydrated]);
 
   // Persist selected id
   useEffect(() => {
@@ -321,7 +324,7 @@ export default function App() {
   const handleExport = useCallback(() => {
     const data = {
       exportedAt: new Date().toISOString(),
-      version: '3.0.0',
+      version: '3.1.0',
       questions,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -479,11 +482,13 @@ export default function App() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddQuestion}
+        categories={categories}
       />
       <AddQuestionModal
         isOpen={editingQuestion !== null}
         onClose={() => setEditingQuestion(null)}
         onAdd={handleEditQuestion}
+        categories={categories}
         initialData={editInitialData}
       />
       <BatchImportModal

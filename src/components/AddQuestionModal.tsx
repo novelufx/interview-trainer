@@ -17,13 +17,18 @@ interface AddQuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (data: QuestionFormData) => void;
+  categories: string[];
   initialData?: QuestionFormData;
 }
 
-export default function AddQuestionModal({ isOpen, onClose, onAdd, initialData }: AddQuestionModalProps) {
+const NEW_CATEGORY_VALUE = '__new_category__';
+
+export default function AddQuestionModal({ isOpen, onClose, onAdd, categories, initialData }: AddQuestionModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [newCategory, setNewCategory] = useState('');
+  const [categoryError, setCategoryError] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('简单');
   const [tagsInput, setTagsInput] = useState('');
   const [answerPointsInput, setAnswerPointsInput] = useState('');
@@ -38,7 +43,14 @@ export default function AddQuestionModal({ isOpen, onClose, onAdd, initialData }
       if (initialData) {
         setTitle(initialData.title);
         setContent(initialData.content);
-        setCategory(initialData.category);
+        if (categories.includes(initialData.category)) {
+          setSelectedCategory(initialData.category);
+          setNewCategory('');
+        } else {
+          setSelectedCategory(NEW_CATEGORY_VALUE);
+          setNewCategory(initialData.category);
+        }
+        setCategoryError('');
         setDifficulty(initialData.difficulty);
         setTagsInput(initialData.tags.join(', '));
         setAnswerPointsInput(initialData.answerPoints.join('\n'));
@@ -46,7 +58,9 @@ export default function AddQuestionModal({ isOpen, onClose, onAdd, initialData }
       } else {
         setTitle('');
         setContent('');
-        setCategory('');
+        setSelectedCategory('');
+        setNewCategory('');
+        setCategoryError('');
         setDifficulty('简单');
         setTagsInput('');
         setAnswerPointsInput('');
@@ -56,16 +70,23 @@ export default function AddQuestionModal({ isOpen, onClose, onAdd, initialData }
     if (!isOpen) {
       initializedRef.current = false;
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, categories]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !category.trim()) return;
+    const category =
+      selectedCategory === NEW_CATEGORY_VALUE ? newCategory.trim() : selectedCategory.trim();
+
+    if (!title.trim()) return;
+    if (!category) {
+      setCategoryError('请选择已有分类或输入新分类');
+      return;
+    }
 
     const tags = tagsInput
-      .split(',')
+      .split(/[，,]/)
       .map((t) => t.trim())
       .filter(Boolean);
     const answerPoints = answerPointsInput
@@ -131,14 +152,35 @@ export default function AddQuestionModal({ isOpen, onClose, onAdd, initialData }
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 分类 <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="如：JavaScript"
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setCategoryError('');
+                }}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
+              >
+                <option value="">请选择分类</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+                <option value={NEW_CATEGORY_VALUE}>+ 新建分类</option>
+              </select>
+              {selectedCategory === NEW_CATEGORY_VALUE && (
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => {
+                    setNewCategory(e.target.value);
+                    setCategoryError('');
+                  }}
+                  placeholder="请输入新分类"
+                  className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              )}
+              {categoryError && (
+                <p className="mt-1 text-xs text-red-500">{categoryError}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

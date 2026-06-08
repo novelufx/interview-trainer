@@ -1,7 +1,7 @@
 {
   "name": "interview-trainer",
   "private": true,
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "一个用于整理和练习前端面试题的本地 Web 应用",
   "type": "module",
   "scripts": {

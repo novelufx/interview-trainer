@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Sparkles,
   BarChart3,
@@ -21,10 +21,17 @@ interface AiResultPanelProps {
 export default function AiResultPanel({ question, onUpdate }: AiResultPanelProps) {
   const [aiLoading, setAiLoading] = useState<'optimize' | 'score' | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [showOptimized, setShowOptimized] = useState(!!question.aiOptimizedAnswer);
-  const [showScore, setShowScore] = useState(!!question.aiScore);
+  const [showOptimized, setShowOptimized] = useState(false);
+  const [showScore, setShowScore] = useState(false);
   const [copied, setCopied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    setShowOptimized(false);
+    setShowScore(false);
+    setAiError(null);
+    setCopied(false);
+  }, [question.id]);
 
   const settings = loadAiSettings();
   const configured = isAiConfigured(settings);

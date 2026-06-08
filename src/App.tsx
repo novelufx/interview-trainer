@@ -324,7 +324,7 @@ export default function App() {
   const handleExport = useCallback(() => {
     const data = {
       exportedAt: new Date().toISOString(),
-      version: '3.1.0',
+      version: '3.2.0',
       questions,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });

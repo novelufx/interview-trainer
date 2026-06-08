@@ -25,7 +25,7 @@ export default function QuestionList({ questions, selectedId, onSelect }: Questi
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div>
       {questions.map((q) => (
         <div
           key={q.id}

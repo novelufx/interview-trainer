@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp, ListChecks, BookOpen } from 'lucide-react';
 import type { InterviewQuestion } from '../types/question';
 
@@ -9,6 +9,11 @@ interface AnswerPanelProps {
 export default function AnswerPanel({ question }: AnswerPanelProps) {
   const [showPoints, setShowPoints] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+
+  useEffect(() => {
+    setShowPoints(false);
+    setShowAnswer(false);
+  }, [question.id]);
 
   return (
     <div className="space-y-3">
